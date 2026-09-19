@@ -152,6 +152,8 @@ const Pomodoro = {
   },
 };
 
+window.Pomodoro = Pomodoro;
+
 document.addEventListener("DOMContentLoaded", () => {
   Pomodoro.init();
 });
