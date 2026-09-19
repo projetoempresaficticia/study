@@ -57,9 +57,8 @@ const Pomodoro = {
   intervalId: null,
 
   init() {
-    this.subjectSelect = document.getElementById("pomodoro-subject");
-    this.customWrap = document.getElementById("pomodoro-custom-wrap");
-    this.customInput = document.getElementById("pomodoro-custom-subject");
+    this.subjectInput = document.getElementById("pomodoro-subject");
+    this.subjectOptions = document.getElementById("pomodoro-subject-options");
     this.render();
     document.getElementById("pomodoro-start").addEventListener("click", () => this.start());
     document.getElementById("pomodoro-pause").addEventListener("click", () => this.pause());
@@ -67,38 +66,20 @@ const Pomodoro = {
     document.getElementById("pomodoro-mini-start").addEventListener("click", () => {
       window.SPApp && window.SPApp.showView("pomodoro");
     });
-    this.subjectSelect.addEventListener("change", () => {
-      const isCustom = this.subjectSelect.value === "__custom__";
-      this.customWrap.hidden = !isCustom;
-      if (isCustom) this.customInput.focus();
-    });
   },
 
   populateSubjects(languages) {
-    if (!this.subjectSelect) return;
-    const previous = this.subjectSelect.value;
-    this.subjectSelect.innerHTML = '<option value="">(nenhuma)</option>';
+    if (!this.subjectOptions) return;
+    this.subjectOptions.innerHTML = "";
     languages.forEach((lang) => {
       const opt = document.createElement("option");
       opt.value = lang;
-      opt.textContent = lang;
-      this.subjectSelect.appendChild(opt);
+      this.subjectOptions.appendChild(opt);
     });
-    const customOpt = document.createElement("option");
-    customOpt.value = "__custom__";
-    customOpt.textContent = "Personalizado…";
-    this.subjectSelect.appendChild(customOpt);
-    if ([...this.subjectSelect.options].some((o) => o.value === previous)) {
-      this.subjectSelect.value = previous;
-    }
   },
 
   currentSubject() {
-    if (!this.subjectSelect) return "";
-    if (this.subjectSelect.value === "__custom__") {
-      return (this.customInput && this.customInput.value.trim()) || "";
-    }
-    return this.subjectSelect.value;
+    return this.subjectInput ? this.subjectInput.value.trim() : "";
   },
 
   start() {
