@@ -1053,6 +1053,36 @@ a.btn:hover {
   color: white;
 }
 
+.view-toggle {
+  display: flex;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  margin-left: auto;
+}
+
+.view-toggle-btn {
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+}
+
+.view-toggle-btn i {
+  width: 16px;
+  height: 16px;
+}
+
+.view-toggle-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
 .books-list {
   display: flex;
   flex-direction: column;
@@ -1070,10 +1100,95 @@ a.btn:hover {
 }
 
 .book-item-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+}
+
+/* Book covers (fetched lazily from Google Books / Open Library, see
+   js/book-covers.js) with a lettered fallback tile while unresolved or
+   when no cover was found anywhere. */
+
+.book-cover {
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-cover-sm {
+  width: 40px;
+  height: 58px;
+}
+
+.book-cover-lg {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+}
+
+.book-cover-fallback {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.book-cover-lg .book-cover-fallback {
+  font-size: 32px;
+}
+
+.book-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Grid view */
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 18px;
+}
+
+.book-grid-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-grid-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.book-grid-info .book-title {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-grid-info .book-meta {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-grid-info .star-rating {
+  width: 76px;
+  font-size: 14px;
+}
+
+.book-grid-info .book-status-select {
+  width: 100%;
+  text-align: center;
 }
 
 .book-title {
@@ -1262,5 +1377,9 @@ a.btn:hover {
   }
   .book-status-select {
     align-self: flex-start;
+  }
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 12px;
   }
 }

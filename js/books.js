@@ -34,16 +34,29 @@ function starRatingHtml(row, rating) {
   `;
 }
 
+function bookCoverHtml(b, size) {
+  const initial = (b.title || "?").trim().charAt(0).toUpperCase();
+  return `
+    <div class="book-cover book-cover-${size}" data-pending data-title="${escapeHtmlBooks(b.title)}" data-author="${escapeHtmlBooks(b.author || "")}">
+      <span class="book-cover-fallback">${initial}</span>
+    </div>
+  `;
+}
+
+const VIEW_MODE_KEY = "sp_books_view_mode";
+
 const Books = {
   data: null,
   filterStatus: "all",
   filterQuery: "",
+  viewMode: localStorage.getItem(VIEW_MODE_KEY) || "grid",
 
   init(data) {
     this.data = data;
     this.renderHomeSummary();
     this.populateFormOptions();
     this.renderStatusTabs();
+    this.renderViewToggle();
     this.renderList();
     this.updateStatsLine();
 
@@ -143,15 +156,37 @@ const Books = {
     });
   },
 
+  renderViewToggle() {
+    const wrap = document.getElementById("books-view-toggle");
+    if (!wrap) return;
+    wrap.innerHTML = `
+      <button type="button" class="view-toggle-btn ${this.viewMode === "grid" ? "active" : ""}" data-mode="grid" title="Grade" aria-label="Ver em grade"><i data-lucide="layout-grid"></i></button>
+      <button type="button" class="view-toggle-btn ${this.viewMode === "list" ? "active" : ""}" data-mode="list" title="Lista" aria-label="Ver em lista"><i data-lucide="list"></i></button>
+    `;
+    wrap.querySelectorAll(".view-toggle-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        this.viewMode = btn.dataset.mode;
+        localStorage.setItem(VIEW_MODE_KEY, this.viewMode);
+        this.renderViewToggle();
+        this.renderList();
+      });
+    });
+    if (window.lucide) lucide.createIcons();
+  },
+
   renderList() {
     const list = document.getElementById("books-list");
     const books = this.sortedFilteredBooks();
+    list.classList.toggle("books-grid", this.viewMode === "grid");
+    list.classList.toggle("books-list", this.viewMode === "list");
     if (books.length === 0) {
       list.innerHTML = '<p class="slot-empty">Nenhum livro encontrado.</p>';
       return;
     }
-    list.innerHTML = books.map((b) => this.bookItemHtml(b)).join("");
+    const itemFn = this.viewMode === "grid" ? this.bookGridItemHtml : this.bookItemHtml;
+    list.innerHTML = books.map((b) => itemFn(b)).join("");
     if (window.lucide) lucide.createIcons();
+    if (window.CoverObserver) CoverObserver.observeAll(list);
   },
 
   bookItemHtml(b) {
@@ -161,6 +196,7 @@ const Books = {
     ).join("");
     return `
       <article class="book-item">
+        ${bookCoverHtml(b, "sm")}
         <div class="book-item-main">
           <h4 class="book-title">${escapeHtmlBooks(b.title)}</h4>
           ${metaParts.length ? `<p class="book-meta">${metaParts.map(escapeHtmlBooks).join(" · ")}</p>` : ""}
@@ -170,6 +206,23 @@ const Books = {
           </button>
         </div>
         <select class="book-status-select" data-row="${b.row}">${statusOptions}</select>
+      </article>
+    `;
+  },
+
+  bookGridItemHtml(b) {
+    const statusOptions = STATUS_ORDER.map(
+      (s) => `<option value="${s}" ${s === b.status ? "selected" : ""}>${STATUS_LABELS[s]}</option>`
+    ).join("");
+    return `
+      <article class="book-grid-item">
+        ${bookCoverHtml(b, "lg")}
+        <div class="book-grid-info">
+          <h4 class="book-title" title="${escapeHtmlBooks(b.title)}">${escapeHtmlBooks(b.title)}</h4>
+          ${b.author ? `<p class="book-meta">${escapeHtmlBooks(b.author)}</p>` : ""}
+          ${starRatingHtml(b.row, b.rating)}
+          <select class="book-status-select" data-row="${b.row}">${statusOptions}</select>
+        </div>
       </article>
     `;
   },
