@@ -67,6 +67,42 @@ const GithubSync = {
   updateBook({ row, fields }) {
     return this.dispatch("update-book", { row, fields });
   },
+
+  // Manually-uploaded book covers commit straight to the repo via the
+  // Contents API instead of a repository_dispatch — there's no xlsx/JSON to
+  // update, just a static image file, so the Action pipeline is unnecessary.
+  async uploadCoverImage(row, base64Content) {
+    const { repo, token } = Settings.get();
+    if (!repo || !token) {
+      console.warn("GitHub sync not configured — cover kept locally only.");
+      return { ok: false, reason: "not-configured" };
+    }
+
+    const path = `covers/book-${row}.jpg`;
+    try {
+      const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+        method: "PUT",
+        headers: {
+          Accept: "application/vnd.github+json",
+          Authorization: `Bearer ${token}`,
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+        body: JSON.stringify({
+          message: `chore: add cover for book row ${row}`,
+          content: base64Content,
+        }),
+      });
+      if (res.status === 201 || res.status === 200) {
+        return { ok: true };
+      }
+      const body = await res.text();
+      console.error("Cover upload failed:", res.status, body);
+      return { ok: false, reason: `http-${res.status}`, body };
+    } catch (err) {
+      console.error("Cover upload error:", err);
+      return { ok: false, reason: "network" };
+    }
+  },
 };
 
 window.GithubSync = GithubSync;

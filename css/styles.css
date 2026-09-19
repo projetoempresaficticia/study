@@ -1112,6 +1112,7 @@ a.btn:hover {
    when no cover was found anywhere. */
 
 .book-cover {
+  position: relative;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -1119,6 +1120,32 @@ a.btn:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.book-cover-upload {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.35);
+  transition: background 0.15s ease;
+}
+
+.book-cover-upload:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.book-cover-upload i {
+  width: 18px;
+  height: 18px;
+}
+
+.book-cover-sm .book-cover-upload i {
+  width: 12px;
+  height: 12px;
 }
 
 .book-cover-sm {

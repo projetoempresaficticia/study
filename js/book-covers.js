@@ -96,9 +96,47 @@ async function resolveCoverUrl(title, author) {
   return url;
 }
 
+function manualCoverPath(row) {
+  return `covers/book-${row}.jpg`;
+}
+
+function imageExists(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = src;
+  });
+}
+
+function setCoverImage(el, src) {
+  const img = document.createElement("img");
+  img.src = src;
+  img.alt = "";
+  img.loading = "lazy";
+  img.className = "book-cover-img";
+  el.innerHTML = "";
+  el.appendChild(img);
+}
+
+function showUploadButton(el, row, title) {
+  const initial = (title || "?").trim().charAt(0).toUpperCase();
+  el.innerHTML = `
+    <span class="book-cover-fallback">${initial}</span>
+    <label class="book-cover-upload" title="Adicionar capa">
+      <i data-lucide="plus"></i>
+      <input type="file" accept="image/*" class="book-cover-upload-input" data-row="${row}" hidden />
+    </label>
+  `;
+  if (window.lucide) lucide.createIcons();
+}
+
 // Watches .book-cover[data-pending] placeholders and resolves their cover
 // only once scrolled near the viewport, so a 199-book list doesn't fire
-// 199 lookups on load.
+// 199 lookups on load. Checks for a manually-uploaded cover first
+// (covers/book-<row>.jpg, committed straight to the repo — see
+// GithubSync.uploadCoverImage), then Google Books / Open Library, and
+// finally offers the "+" upload button when nothing is found anywhere.
 const CoverObserver = {
   observer: null,
 
@@ -125,17 +163,71 @@ const CoverObserver = {
   async resolve(el) {
     const title = el.dataset.title || "";
     const author = el.dataset.author || "";
+    const row = el.dataset.row;
     delete el.dataset.pending;
+
+    const manualPath = manualCoverPath(row);
+    if (await imageExists(manualPath)) {
+      setCoverImage(el, manualPath);
+      return;
+    }
+
     const url = await resolveCoverUrl(title, author);
-    if (!url) return;
-    const img = document.createElement("img");
-    img.src = url;
-    img.alt = "";
-    img.loading = "lazy";
-    img.className = "book-cover-img";
-    el.innerHTML = "";
-    el.appendChild(img);
+    if (url) {
+      setCoverImage(el, url);
+      return;
+    }
+
+    showUploadButton(el, row, title);
   },
 };
 
 window.CoverObserver = CoverObserver;
+
+async function resizeImageToDataUrl(file, maxDim, quality) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const el = new Image();
+    el.onload = () => resolve(el);
+    el.onerror = reject;
+    el.src = dataUrl;
+  });
+  let { width, height } = img;
+  if (width > height && width > maxDim) {
+    height = Math.round((height * maxDim) / width);
+    width = maxDim;
+  } else if (height > maxDim) {
+    width = Math.round((width * maxDim) / height);
+    height = maxDim;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+  return canvas.toDataURL("image/jpeg", quality);
+}
+
+async function handleCoverUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const row = input.dataset.row;
+  const wrap = input.closest(".book-cover");
+
+  const dataUrl = await resizeImageToDataUrl(file, 640, 0.82);
+  if (wrap) setCoverImage(wrap, dataUrl);
+
+  const base64 = dataUrl.split(",")[1];
+  const result = await GithubSync.uploadCoverImage(row, base64);
+  if (window.SPApp) window.SPApp.warnIfNotSynced(result);
+}
+
+document.addEventListener("change", (e) => {
+  if (e.target.classList && e.target.classList.contains("book-cover-upload-input")) {
+    handleCoverUpload(e.target);
+  }
+});
