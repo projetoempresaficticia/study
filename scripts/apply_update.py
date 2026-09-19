@@ -16,6 +16,14 @@ step — not a dependency for local/browser use). Two event types:
       Appends a row to a "POMODORO LOG" sheet (created with a header row on
       first use).
 
+  add-event     {"id": "...", "date": "2026-09-20", "title": "...",
+                  "color": "#FFD1DC", "note": "..."}
+      Appends a row to an "EVENTS" sheet (created with a header row on first
+      use) — a calendar event.
+
+  delete-event  {"id": "..."}
+      Removes the row from "EVENTS" whose id matches.
+
 After writing, run scripts/xlsx_to_json.py separately to refresh the JSON
 snapshot the frontend reads — this script only touches the .xlsx.
 """
@@ -29,6 +37,8 @@ ROOT = Path(__file__).resolve().parent.parent
 XLSX_PATH = ROOT / "STUDY PLAN 2026.xlsx"
 POMODORO_SHEET = "POMODORO LOG"
 POMODORO_HEADERS = ["timestamp", "minutes", "subject", "note"]
+EVENTS_SHEET = "EVENTS"
+EVENTS_HEADERS = ["id", "date", "title", "color", "note"]
 
 
 def apply_toggle_slot(wb, payload):
@@ -77,10 +87,44 @@ def apply_log_session(wb, payload):
     print(f"Logged pomodoro session to '{POMODORO_SHEET}': {payload}")
 
 
+def apply_add_event(wb, payload):
+    if EVENTS_SHEET not in wb.sheetnames:
+        ws = wb.create_sheet(EVENTS_SHEET)
+        ws.append(EVENTS_HEADERS)
+    else:
+        ws = wb[EVENTS_SHEET]
+    ws.append(
+        [
+            payload["id"],
+            payload["date"],
+            payload.get("title", ""),
+            payload.get("color", ""),
+            payload.get("note", ""),
+        ]
+    )
+    print(f"Added event {payload['id']!r} on {payload['date']!r} to '{EVENTS_SHEET}'")
+
+
+def apply_delete_event(wb, payload):
+    target_id = str(payload["id"])
+    if EVENTS_SHEET not in wb.sheetnames:
+        print(f"No '{EVENTS_SHEET}' sheet — nothing to delete")
+        return
+    ws = wb[EVENTS_SHEET]
+    for row in range(ws.max_row, 1, -1):
+        if str(ws.cell(row=row, column=1).value) == target_id:
+            ws.delete_rows(row, 1)
+            print(f"Deleted event {target_id!r} (row {row})")
+            return
+    print(f"Event {target_id!r} not found in '{EVENTS_SHEET}'")
+
+
 HANDLERS = {
     "toggle-slot": apply_toggle_slot,
     "set-slot": apply_set_slot,
     "log-session": apply_log_session,
+    "add-event": apply_add_event,
+    "delete-event": apply_delete_event,
 }
 
 

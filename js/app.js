@@ -20,7 +20,7 @@ function showView(view) {
   document.querySelectorAll(".nav-item").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === view);
   });
-  ["home", "timetable", "pomodoro", "settings"].forEach((v) => {
+  ["home", "timetable", "pomodoro", "calendar", "settings"].forEach((v) => {
     const el = document.getElementById(`view-${v}`);
     if (el) el.hidden = v !== view;
   });
@@ -367,9 +367,13 @@ async function init() {
     Pomodoro.populateSubjects(State.data.languages);
   }
 
+  if (window.Calendar) {
+    Calendar.init(State.data.events || []);
+  }
+
   if (window.lucide) lucide.createIcons();
 }
 
-window.SPApp = { showView };
+window.SPApp = { showView, warnIfNotSynced };
 
 document.addEventListener("DOMContentLoaded", init);

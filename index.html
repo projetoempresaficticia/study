@@ -26,6 +26,10 @@
       <i data-lucide="timer"></i>
       <span>Foco</span>
     </button>
+    <button class="nav-item" data-view="calendar" title="Calendário">
+      <i data-lucide="calendar"></i>
+      <span>Calendário</span>
+    </button>
     <button class="nav-item" data-view="settings" title="Configurações">
       <i data-lucide="settings"></i>
       <span>Ajustes</span>
@@ -95,6 +99,17 @@
         <ul class="language-list" id="language-list"></ul>
       </article>
 
+      <article class="card card-calendar">
+        <div class="card-head">
+          <span>Calendário</span>
+          <i data-lucide="calendar"></i>
+        </div>
+        <p class="mini-calendar-month" id="mini-calendar-month"></p>
+        <div class="mini-calendar-head" id="mini-calendar-head"></div>
+        <div class="mini-calendar-grid" id="mini-calendar-grid"></div>
+        <button class="btn btn-ghost btn-block" id="mini-calendar-open">Ver calendário completo</button>
+      </article>
+
     </section>
 
     <section class="view view-timetable" id="view-timetable" hidden>
@@ -141,6 +156,21 @@
       </div>
     </section>
 
+    <section class="view view-calendar" id="view-calendar" hidden>
+      <div class="view-header">
+        <div class="view-title">
+          <h2>Calendário</h2>
+        </div>
+        <div class="calendar-nav">
+          <button class="btn btn-ghost" id="calendar-prev" aria-label="Mês anterior"><i data-lucide="chevron-left"></i></button>
+          <span id="calendar-month-label">—</span>
+          <button class="btn btn-ghost" id="calendar-next" aria-label="Próximo mês"><i data-lucide="chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="calendar-grid-head" id="calendar-grid-head"></div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </section>
+
     <section class="view view-settings" id="view-settings" hidden>
       <div class="view-header">
         <div class="view-title">
@@ -178,10 +208,28 @@
   </main>
 </div>
 
+<div class="modal-overlay" id="day-modal-overlay" hidden>
+  <div class="modal" id="day-modal" role="dialog" aria-modal="true" aria-labelledby="day-modal-date">
+    <div class="modal-header">
+      <h3 id="day-modal-date">—</h3>
+      <button class="modal-close" id="day-modal-close" aria-label="Fechar"><i data-lucide="x"></i></button>
+    </div>
+    <ul class="day-event-list" id="day-event-list"></ul>
+    <form class="day-event-form" id="day-event-form">
+      <input type="text" id="day-event-title" placeholder="Novo evento..." maxlength="60" required />
+      <div class="color-swatches" id="color-swatches"></div>
+      <button type="submit" class="btn btn-primary btn-block">
+        <i data-lucide="plus"></i> Adicionar evento
+      </button>
+    </form>
+  </div>
+</div>
+
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="js/settings.js"></script>
 <script src="js/github-sync.js"></script>
 <script src="js/pomodoro.js"></script>
+<script src="js/calendar.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

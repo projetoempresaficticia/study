@@ -215,6 +215,27 @@ def parse_pomodoro_log(cells):
     return entries
 
 
+def parse_events(cells):
+    """Optional 'EVENTS' sheet: header row 1 (id, date, title, color, note),
+    data from row 2 onward. Returns [] if not present."""
+    if not cells:
+        return []
+    entries = []
+    row = 2
+    while f"A{row}" in cells:
+        entries.append(
+            {
+                "id": cells.get(f"A{row}"),
+                "date": cells.get(f"B{row}"),
+                "title": cells.get(f"C{row}"),
+                "color": cells.get(f"D{row}"),
+                "note": cells.get(f"E{row}"),
+            }
+        )
+        row += 1
+    return entries
+
+
 def main():
     if not XLSX_PATH.exists():
         print(f"ERROR: {XLSX_PATH} not found", file=sys.stderr)
@@ -226,12 +247,16 @@ def main():
 
         months = []
         pomodoro_log = []
+        events = []
         languages = set()
 
         for name, path in sheets:
             cells = parse_sheet_cells(z, path, shared)
             if name.strip().upper() == "POMODORO LOG":
                 pomodoro_log = parse_pomodoro_log(cells)
+                continue
+            if name.strip().upper() == "EVENTS":
+                events = parse_events(cells)
                 continue
             weeks = parse_month_sheet(cells)
             if not weeks:
@@ -248,12 +273,16 @@ def main():
         "languages": sorted(languages),
         "months": months,
         "pomodoroLog": pomodoro_log,
+        "events": events,
     }
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(output, indent=2, ensure_ascii=False), encoding="utf-8")
     total_slots = sum(len(d["slots"]) for m in months for w in m["weeks"] for d in w["days"])
-    print(f"Wrote {OUT_PATH} — {len(months)} months, {total_slots} slots, {len(pomodoro_log)} pomodoro log entries")
+    print(
+        f"Wrote {OUT_PATH} — {len(months)} months, {total_slots} slots, "
+        f"{len(pomodoro_log)} pomodoro log entries, {len(events)} calendar events"
+    )
 
 
 if __name__ == "__main__":
