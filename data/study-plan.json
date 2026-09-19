@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T15:41:16.466171+00:00",
+  "generatedAt": "2026-09-19T15:44:44.759610+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -2137,7 +2137,7 @@
                 {
                   "row": 4,
                   "subject": "ALEMÃO",
-                  "status": null,
+                  "status": "DONE",
                   "subjectCell": "C4",
                   "statusCell": "D4"
                 },
@@ -2492,9 +2492,9 @@
             }
           ],
           "stats": {
-            "done": 0,
+            "done": 1,
             "notDone": 0,
-            "ratio": null,
+            "ratio": 1.0,
             "byLanguage": {
               "EMOCIONAL": {
                 "done": 0,
@@ -2513,7 +2513,7 @@
                 "notDone": 0
               },
               "ALEMÃO": {
-                "done": 0,
+                "done": 1,
                 "notDone": 0
               },
               "ESPANHOL": {
