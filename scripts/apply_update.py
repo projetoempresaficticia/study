@@ -20,9 +20,18 @@ STUDY PLAN 2026.xlsx events:
       first use).
 
   add-event     {"id": "...", "date": "2026-09-20", "title": "...",
-                  "color": "#FFD1DC", "note": "..."}
+                  "color": "#FFD1DC", "note": "...", "type": "task",
+                  "done": false, "subtasks": [{"id":"..","title":"..","done":false}]}
       Appends a row to an "EVENTS" sheet (created with a header row on first
-      use) — a calendar event.
+      use) — a calendar event or task. `type` is "event" or "task";
+      `subtasks` only makes sense for tasks and is stored JSON-encoded in
+      one cell (a flat sheet can't nest rows under a parent).
+
+  update-event  {"id": "...", "fields": {"done": true, "subtasks": [...]}}
+      Updates whichever of title/color/note/type/done/subtasks are given,
+      on the row whose id matches — used for toggling a task done and for
+      every subtask add/toggle/delete (the frontend always sends the whole
+      subtasks array back, not a diff).
 
   delete-event  {"id": "..."}
       Removes the row from "EVENTS" whose id matches.
@@ -59,7 +68,7 @@ BOOKS_XLSX_PATH = ROOT / "Books.xlsx"
 POMODORO_SHEET = "POMODORO LOG"
 POMODORO_HEADERS = ["timestamp", "minutes", "subject", "note"]
 EVENTS_SHEET = "EVENTS"
-EVENTS_HEADERS = ["id", "date", "title", "color", "note"]
+EVENTS_HEADERS = ["id", "date", "title", "color", "note", "type", "done", "subtasks"]
 BOOKS_SHEET = "BOOKS"
 
 
@@ -122,9 +131,38 @@ def apply_add_event(wb, payload):
             payload.get("title", ""),
             payload.get("color", ""),
             payload.get("note", ""),
+            payload.get("type", "event"),
+            "TRUE" if payload.get("done") else "FALSE",
+            json.dumps(payload.get("subtasks", []), ensure_ascii=False),
         ]
     )
-    print(f"Added event {payload['id']!r} on {payload['date']!r} to '{EVENTS_SHEET}'")
+    print(f"Added {payload.get('type', 'event')} {payload['id']!r} on {payload['date']!r} to '{EVENTS_SHEET}'")
+
+
+EVENT_UPDATE_COLUMNS = {"title": 3, "color": 4, "note": 5, "type": 6, "done": 7, "subtasks": 8}
+
+
+def apply_update_event(wb, payload):
+    target_id = str(payload["id"])
+    if EVENTS_SHEET not in wb.sheetnames:
+        raise ValueError(f"No '{EVENTS_SHEET}' sheet — nothing to update")
+    ws = wb[EVENTS_SHEET]
+    fields = payload.get("fields", {})
+    for row in range(2, ws.max_row + 1):
+        if str(ws.cell(row=row, column=1).value) != target_id:
+            continue
+        for field, value in fields.items():
+            col = EVENT_UPDATE_COLUMNS.get(field)
+            if col is None:
+                continue
+            if field == "subtasks":
+                value = json.dumps(value, ensure_ascii=False)
+            elif field == "done":
+                value = "TRUE" if value else "FALSE"
+            ws.cell(row=row, column=col, value=value)
+        print(f"Updated event {target_id!r} (row {row}): {fields}")
+        return
+    print(f"Event {target_id!r} not found in '{EVENTS_SHEET}'")
 
 
 def apply_delete_event(wb, payload):
@@ -200,6 +238,7 @@ HANDLERS = {
     "set-slot": (STUDY_XLSX_PATH, apply_set_slot),
     "log-session": (STUDY_XLSX_PATH, apply_log_session),
     "add-event": (STUDY_XLSX_PATH, apply_add_event),
+    "update-event": (STUDY_XLSX_PATH, apply_update_event),
     "delete-event": (STUDY_XLSX_PATH, apply_delete_event),
     "add-book": (BOOKS_XLSX_PATH, apply_add_book),
     "update-book": (BOOKS_XLSX_PATH, apply_update_book),

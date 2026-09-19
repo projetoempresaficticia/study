@@ -245,10 +245,14 @@
     </div>
     <ul class="day-event-list" id="day-event-list"></ul>
     <form class="day-event-form" id="day-event-form">
+      <div class="entry-type-toggle" id="entry-type-toggle">
+        <button type="button" class="entry-type-btn active" data-type="event">Evento</button>
+        <button type="button" class="entry-type-btn" data-type="task">Tarefa</button>
+      </div>
       <input type="text" id="day-event-title" placeholder="Novo evento..." maxlength="60" required />
       <textarea id="day-event-note" placeholder="Descrição (opcional)..." maxlength="240" rows="2"></textarea>
       <div class="color-swatches" id="color-swatches"></div>
-      <button type="submit" class="btn btn-primary btn-block">
+      <button type="submit" class="btn btn-primary btn-block" id="day-event-submit">
         <i data-lucide="plus"></i> Adicionar evento
       </button>
     </form>

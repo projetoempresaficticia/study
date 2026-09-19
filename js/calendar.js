@@ -31,6 +31,7 @@ const Calendar = {
   viewYear: null,
   viewMonth: null,
   selectedDate: null,
+  selectedType: "event",
 
   init(events) {
     this.events = events || [];
@@ -50,6 +51,10 @@ const Calendar = {
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") this.closeModal();
     });
+    document.getElementById("entry-type-toggle").addEventListener("click", (e) => {
+      const btn = e.target.closest(".entry-type-btn");
+      if (btn) this.setSelectedType(btn.dataset.type);
+    });
     document.getElementById("day-event-form").addEventListener("submit", (e) => {
       e.preventDefault();
       this.submitNewEvent();
@@ -58,6 +63,19 @@ const Calendar = {
     this.renderColorSwatches();
     this.renderMiniCalendar();
     this.renderFullCalendar();
+  },
+
+  setSelectedType(type) {
+    this.selectedType = type;
+    document.querySelectorAll("#entry-type-toggle .entry-type-btn").forEach((b) => {
+      b.classList.toggle("active", b.dataset.type === type);
+    });
+    const isTask = type === "task";
+    document.getElementById("day-event-title").placeholder = isTask ? "Nova tarefa..." : "Novo evento...";
+    document.getElementById("day-event-submit").innerHTML = isTask
+      ? '<i data-lucide="plus"></i> Adicionar tarefa'
+      : '<i data-lucide="plus"></i> Adicionar evento';
+    if (window.lucide) lucide.createIcons();
   },
 
   setEvents(events) {
@@ -180,7 +198,12 @@ const Calendar = {
         const extra = dayEvents.length - visible.length;
 
         const pills = visible
-          .map((ev) => `<span class="event-pill" style="background:${ev.color || "#eee"}">${escapeHtml(ev.title)}</span>`)
+          .map((ev) => {
+            const isTask = ev.type === "task";
+            const prefix = isTask ? (ev.done ? "☑ " : "☐ ") : "";
+            const doneClass = isTask && ev.done ? " event-pill-done" : "";
+            return `<span class="event-pill${doneClass}" style="background:${ev.color || "#eee"}">${prefix}${escapeHtml(ev.title)}</span>`;
+          })
           .join("");
         const moreLink = extra > 0 ? `<button type="button" class="event-more" data-date="${dateStr}">+ ver mais (${extra})</button>` : "";
 
@@ -219,6 +242,7 @@ const Calendar = {
     document.getElementById("day-modal-date").textContent = capitalize(fmt.format(new Date(Date.UTC(y, m - 1, d))));
     document.getElementById("day-event-title").value = "";
     document.getElementById("day-event-note").value = "";
+    this.setSelectedType("event");
     this.renderDayEventList();
     overlay.hidden = false;
     if (window.lucide) lucide.createIcons();
@@ -233,26 +257,79 @@ const Calendar = {
     const list = document.getElementById("day-event-list");
     const dayEvents = this.eventsByDate(this.selectedDate);
     if (dayEvents.length === 0) {
-      list.innerHTML = '<li class="slot-empty">Nenhum evento neste dia ainda.</li>';
+      list.innerHTML = '<li class="slot-empty">Nada neste dia ainda.</li>';
       return;
     }
-    list.innerHTML = dayEvents
+    list.innerHTML = dayEvents.map((ev) => (ev.type === "task" ? this.taskItemHtml(ev) : this.eventItemHtml(ev))).join("");
+
+    list.querySelectorAll(".day-event-delete").forEach((btn) => {
+      btn.addEventListener("click", () => this.deleteEvent(btn.dataset.id));
+    });
+    list.querySelectorAll(".task-done-checkbox").forEach((cb) => {
+      cb.addEventListener("change", () => this.toggleTaskDone(cb.dataset.id, cb.checked));
+    });
+    list.querySelectorAll(".subtask-done-checkbox").forEach((cb) => {
+      cb.addEventListener("change", () => this.toggleSubtask(cb.dataset.eventId, cb.dataset.subtaskId, cb.checked));
+    });
+    list.querySelectorAll(".subtask-delete").forEach((btn) => {
+      btn.addEventListener("click", () => this.deleteSubtask(btn.dataset.eventId, btn.dataset.subtaskId));
+    });
+    list.querySelectorAll(".add-subtask-form").forEach((form) => {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = form.querySelector(".add-subtask-input");
+        const title = input.value.trim();
+        if (!title) return;
+        this.addSubtask(form.dataset.eventId, title);
+        input.value = "";
+      });
+    });
+    if (window.lucide) lucide.createIcons();
+  },
+
+  eventItemHtml(ev) {
+    return `
+      <li class="day-event-item" style="background:${ev.color || "#eee"}">
+        <div class="day-event-text">
+          <span class="day-event-title">${escapeHtml(ev.title)}</span>
+          ${ev.note ? `<span class="day-event-note">${escapeHtml(ev.note)}</span>` : ""}
+        </div>
+        <button type="button" class="day-event-delete" data-id="${ev.id}" aria-label="Remover evento"><i data-lucide="x"></i></button>
+      </li>
+    `;
+  },
+
+  taskItemHtml(ev) {
+    const subtasks = ev.subtasks || [];
+    const subtaskItems = subtasks
       .map(
-        (ev) => `
-        <li class="day-event-item" style="background:${ev.color || "#eee"}">
-          <div class="day-event-text">
-            <span class="day-event-title">${escapeHtml(ev.title)}</span>
-            ${ev.note ? `<span class="day-event-note">${escapeHtml(ev.note)}</span>` : ""}
-          </div>
-          <button type="button" class="day-event-delete" data-id="${ev.id}" aria-label="Remover evento"><i data-lucide="x"></i></button>
+        (st) => `
+        <li class="subtask-item">
+          <label class="task-checkbox">
+            <input type="checkbox" class="subtask-done-checkbox" data-event-id="${ev.id}" data-subtask-id="${st.id}" ${st.done ? "checked" : ""} />
+            <span class="${st.done ? "done" : ""}">${escapeHtml(st.title)}</span>
+          </label>
+          <button type="button" class="subtask-delete" data-event-id="${ev.id}" data-subtask-id="${st.id}" aria-label="Remover subtarefa"><i data-lucide="x"></i></button>
         </li>
       `
       )
       .join("");
-    list.querySelectorAll(".day-event-delete").forEach((btn) => {
-      btn.addEventListener("click", () => this.deleteEvent(btn.dataset.id));
-    });
-    if (window.lucide) lucide.createIcons();
+    return `
+      <li class="day-event-item day-task-item" style="background:${ev.color || "#eee"}">
+        <div class="day-task-header">
+          <label class="task-checkbox">
+            <input type="checkbox" class="task-done-checkbox" data-id="${ev.id}" ${ev.done ? "checked" : ""} />
+            <span class="day-event-title ${ev.done ? "done" : ""}">${escapeHtml(ev.title)}</span>
+          </label>
+          <button type="button" class="day-event-delete" data-id="${ev.id}" aria-label="Remover tarefa"><i data-lucide="x"></i></button>
+        </div>
+        ${ev.note ? `<span class="day-event-note">${escapeHtml(ev.note)}</span>` : ""}
+        <ul class="subtask-list">${subtaskItems}</ul>
+        <form class="add-subtask-form" data-event-id="${ev.id}">
+          <input type="text" class="add-subtask-input" placeholder="+ subtarefa..." maxlength="80" />
+        </form>
+      </li>
+    `;
   },
 
   async submitNewEvent() {
@@ -263,7 +340,8 @@ const Calendar = {
 
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
     const note = noteInput ? noteInput.value.trim() : "";
-    const event = { id, date: this.selectedDate, title, color: this.selectedColor(), note };
+    const type = this.selectedType === "task" ? "task" : "event";
+    const event = { id, date: this.selectedDate, title, color: this.selectedColor(), note, type, done: false, subtasks: [] };
 
     this.events.push(event);
     input.value = "";
@@ -283,6 +361,49 @@ const Calendar = {
     this.renderFullCalendar();
 
     const result = await GithubSync.deleteEvent({ id });
+    if (window.SPApp) window.SPApp.warnIfNotSynced(result);
+  },
+
+  findEvent(id) {
+    return this.events.find((e) => e.id === id);
+  },
+
+  async toggleTaskDone(id, done) {
+    const ev = this.findEvent(id);
+    if (!ev) return;
+    ev.done = done;
+    this.renderDayEventList();
+    this.renderMiniCalendar();
+    this.renderFullCalendar();
+    const result = await GithubSync.updateEvent({ id, fields: { done } });
+    if (window.SPApp) window.SPApp.warnIfNotSynced(result);
+  },
+
+  async addSubtask(eventId, title) {
+    const ev = this.findEvent(eventId);
+    if (!ev) return;
+    const subtask = { id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, title, done: false };
+    ev.subtasks = [...(ev.subtasks || []), subtask];
+    this.renderDayEventList();
+    const result = await GithubSync.updateEvent({ id: eventId, fields: { subtasks: ev.subtasks } });
+    if (window.SPApp) window.SPApp.warnIfNotSynced(result);
+  },
+
+  async toggleSubtask(eventId, subtaskId, done) {
+    const ev = this.findEvent(eventId);
+    if (!ev) return;
+    ev.subtasks = (ev.subtasks || []).map((st) => (st.id === subtaskId ? { ...st, done } : st));
+    this.renderDayEventList();
+    const result = await GithubSync.updateEvent({ id: eventId, fields: { subtasks: ev.subtasks } });
+    if (window.SPApp) window.SPApp.warnIfNotSynced(result);
+  },
+
+  async deleteSubtask(eventId, subtaskId) {
+    const ev = this.findEvent(eventId);
+    if (!ev) return;
+    ev.subtasks = (ev.subtasks || []).filter((st) => st.id !== subtaskId);
+    this.renderDayEventList();
+    const result = await GithubSync.updateEvent({ id: eventId, fields: { subtasks: ev.subtasks } });
     if (window.SPApp) window.SPApp.warnIfNotSynced(result);
   },
 };

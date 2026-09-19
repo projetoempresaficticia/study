@@ -52,8 +52,21 @@ const GithubSync = {
     });
   },
 
-  addEvent({ id, date, title, color, note }) {
-    return this.dispatch("add-event", { id, date, title, color: color || "", note: note || "" });
+  addEvent({ id, date, title, color, note, type, done, subtasks }) {
+    return this.dispatch("add-event", {
+      id,
+      date,
+      title,
+      color: color || "",
+      note: note || "",
+      type: type || "event",
+      done: !!done,
+      subtasks: subtasks || [],
+    });
+  },
+
+  updateEvent({ id, fields }) {
+    return this.dispatch("update-event", { id, fields });
   },
 
   deleteEvent({ id }) {

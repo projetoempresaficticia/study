@@ -974,6 +974,128 @@ a.btn:hover {
   border-color: var(--ink);
 }
 
+/* Entry type toggle (Evento / Tarefa) in the day modal's add form */
+
+.entry-type-toggle {
+  display: flex;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.entry-type-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.entry-type-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+/* Tasks + subtasks inside the day modal */
+
+.day-task-item {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.day-task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.task-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.task-checkbox input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.task-checkbox .done {
+  text-decoration: line-through;
+  color: var(--ink-soft);
+}
+
+.subtask-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subtask-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.subtask-delete {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink-soft);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.subtask-delete:hover {
+  color: #d9534f;
+}
+
+.subtask-delete i {
+  width: 12px;
+  height: 12px;
+}
+
+.add-subtask-form {
+  margin: 6px 0 0 22px;
+}
+
+.add-subtask-input {
+  border: none;
+  border-bottom: 1px dashed var(--ink-soft);
+  background: transparent;
+  padding: 2px 0;
+  font-family: inherit;
+  font-size: 13px;
+  width: 100%;
+  max-width: 220px;
+}
+
+.add-subtask-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.event-pill-done {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
 /* Books — home summary card */
 
 .books-summary {

@@ -216,13 +216,25 @@ def parse_pomodoro_log(cells):
 
 
 def parse_events(cells):
-    """Optional 'EVENTS' sheet: header row 1 (id, date, title, color, note),
-    data from row 2 onward. Returns [] if not present."""
+    """Optional 'EVENTS' sheet: header row 1 (id, date, title, color, note,
+    type, done, subtasks), data from row 2 onward. Returns [] if not present.
+
+    `type` is "event" or "task" — blank (rows written before tasks existed)
+    defaults to "event". `subtasks` is a JSON-encoded list of
+    {id, title, done}, stored in one cell since a flat sheet has no native
+    way to nest rows under a parent.
+    """
     if not cells:
         return []
     entries = []
     row = 2
     while f"A{row}" in cells:
+        subtasks_raw = cells.get(f"H{row}")
+        try:
+            subtasks = json.loads(subtasks_raw) if subtasks_raw else []
+        except (TypeError, ValueError):
+            subtasks = []
+        done_raw = cells.get(f"G{row}")
         entries.append(
             {
                 "id": cells.get(f"A{row}"),
@@ -230,6 +242,9 @@ def parse_events(cells):
                 "title": cells.get(f"C{row}"),
                 "color": cells.get(f"D{row}"),
                 "note": cells.get(f"E{row}"),
+                "type": cells.get(f"F{row}") or "event",
+                "done": str(done_raw).strip().upper() == "TRUE" if done_raw is not None else False,
+                "subtasks": subtasks if isinstance(subtasks, list) else [],
             }
         )
         row += 1

@@ -2,7 +2,7 @@ name: Update study plan
 
 on:
   repository_dispatch:
-    types: [toggle-slot, set-slot, log-session, add-event, delete-event, add-book, update-book]
+    types: [toggle-slot, set-slot, log-session, add-event, update-event, delete-event, add-book, update-book]
 
 permissions:
   contents: write
