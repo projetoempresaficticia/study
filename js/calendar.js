@@ -39,23 +39,36 @@ const Calendar = {
     this.viewYear = today.getFullYear();
     this.viewMonth = today.getMonth();
 
-    document.getElementById("calendar-prev").addEventListener("click", () => this.shiftMonth(-1));
-    document.getElementById("calendar-next").addEventListener("click", () => this.shiftMonth(1));
-    document.getElementById("mini-calendar-open").addEventListener("click", () => {
+    // Defensive: a missing element (stale cached HTML vs. fresh JS, a
+    // future markup change, etc.) must not throw and abort the rest of
+    // init() — that previously meant one bad getElementById silently broke
+    // the whole calendar (no render, no listeners at all).
+    const on = (id, evt, handler) => {
+      const el = document.getElementById(id);
+      if (!el) {
+        console.warn(`Calendar.init: #${id} not found — skipping its listener`);
+        return;
+      }
+      el.addEventListener(evt, handler);
+    };
+
+    on("calendar-prev", "click", () => this.shiftMonth(-1));
+    on("calendar-next", "click", () => this.shiftMonth(1));
+    on("mini-calendar-open", "click", () => {
       window.SPApp && window.SPApp.showView("calendar");
     });
-    document.getElementById("day-modal-close").addEventListener("click", () => this.closeModal());
-    document.getElementById("day-modal-overlay").addEventListener("click", (e) => {
+    on("day-modal-close", "click", () => this.closeModal());
+    on("day-modal-overlay", "click", (e) => {
       if (e.target.id === "day-modal-overlay") this.closeModal();
     });
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") this.closeModal();
     });
-    document.getElementById("entry-type-toggle").addEventListener("click", (e) => {
+    on("entry-type-toggle", "click", (e) => {
       const btn = e.target.closest(".entry-type-btn");
       if (btn) this.setSelectedType(btn.dataset.type);
     });
-    document.getElementById("day-event-form").addEventListener("submit", (e) => {
+    on("day-event-form", "submit", (e) => {
       e.preventDefault();
       this.submitNewEvent();
     });
@@ -71,10 +84,12 @@ const Calendar = {
       b.classList.toggle("active", b.dataset.type === type);
     });
     const isTask = type === "task";
-    document.getElementById("day-event-title").placeholder = isTask ? "Nova tarefa..." : "Novo evento...";
-    document.getElementById("day-event-submit").innerHTML = isTask
-      ? '<i data-lucide="plus"></i> Adicionar tarefa'
-      : '<i data-lucide="plus"></i> Adicionar evento';
+    const titleInput = document.getElementById("day-event-title");
+    const submitBtn = document.getElementById("day-event-submit");
+    if (titleInput) titleInput.placeholder = isTask ? "Nova tarefa..." : "Novo evento...";
+    if (submitBtn) {
+      submitBtn.innerHTML = isTask ? '<i data-lucide="plus"></i> Adicionar tarefa' : '<i data-lucide="plus"></i> Adicionar evento';
+    }
     if (window.lucide) lucide.createIcons();
   },
 
