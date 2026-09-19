@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T16:56:30.584735+00:00",
+  "generatedAt": "2026-09-19T16:56:45.179323+00:00",
   "sourceFile": "Books.xlsx",
   "nextRow": 204,
   "genres": [
@@ -35,7 +35,7 @@
   "stats": {
     "total": 199,
     "finished": 189,
-    "avgRating": 3.92,
+    "avgRating": 3.93,
     "totalPages": 24856
   },
   "books": [
@@ -2338,7 +2338,7 @@
       "genre": null,
       "status": "Reading",
       "format": "Physical",
-      "rating": 0.5,
+      "rating": 1.5,
       "pages": null,
       "dateFinished": null,
       "notes": null
