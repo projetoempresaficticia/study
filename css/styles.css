@@ -1273,6 +1273,28 @@ a.btn:hover {
 
 /* Star rating widget (0.5 increments) */
 
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-input {
+  width: 52px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 3px 6px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.book-grid-info .rating-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 .star-rating {
   position: relative;
   display: inline-block;

@@ -18,18 +18,23 @@ function statusPriority(status) {
 
 function starRatingHtml(row, rating) {
   const value = typeof rating === "number" ? rating : 0;
+  // Width-based fill, not snapped to the 10 click targets below, so it also
+  // reflects a precise value typed into the number field (e.g. 3.7).
   const pct = Math.max(0, Math.min(100, (value / 5) * 100));
   const buttons = [];
   for (let i = 1; i <= 10; i++) {
     buttons.push(`<button type="button" class="star-btn" data-row="${row}" data-value="${i / 2}"></button>`);
   }
   return `
-    <div class="star-rating" data-row="${row}" data-rating="${value}">
-      <div class="star-rating-display">
-        <span class="star-track">★★★★★</span>
-        <span class="star-fill" style="width:${pct}%">★★★★★</span>
+    <div class="rating-row">
+      <div class="star-rating" data-row="${row}" data-rating="${value}">
+        <div class="star-rating-display">
+          <span class="star-track">★★★★★</span>
+          <span class="star-fill" style="width:${pct}%">★★★★★</span>
+        </div>
+        <div class="star-rating-hit">${buttons.join("")}</div>
       </div>
-      <div class="star-rating-hit">${buttons.join("")}</div>
+      <input type="number" class="rating-input" data-row="${row}" min="0" max="5" step="0.1" value="${value || ""}" placeholder="nota" />
     </div>
   `;
 }
@@ -37,7 +42,7 @@ function starRatingHtml(row, rating) {
 function bookCoverHtml(b, size) {
   const initial = (b.title || "?").trim().charAt(0).toUpperCase();
   return `
-    <div class="book-cover book-cover-${size}" data-pending data-title="${escapeHtmlBooks(b.title)}" data-author="${escapeHtmlBooks(b.author || "")}">
+    <div class="book-cover book-cover-${size}" data-pending data-row="${b.row}" data-title="${escapeHtmlBooks(b.title)}" data-author="${escapeHtmlBooks(b.author || "")}">
       <span class="book-cover-fallback">${initial}</span>
     </div>
   `;
@@ -92,6 +97,12 @@ const Books = {
     list.addEventListener("change", (e) => {
       if (e.target.classList.contains("book-status-select")) {
         this.setStatus(Number(e.target.dataset.row), e.target.value);
+        return;
+      }
+      if (e.target.classList.contains("rating-input")) {
+        const raw = e.target.value.trim();
+        const value = raw === "" ? null : Math.max(0, Math.min(5, parseFloat(raw)));
+        this.setRating(Number(e.target.dataset.row), value);
       }
     });
   },
