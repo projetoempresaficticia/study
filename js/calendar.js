@@ -218,6 +218,7 @@ const Calendar = {
     const fmt = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
     document.getElementById("day-modal-date").textContent = capitalize(fmt.format(new Date(Date.UTC(y, m - 1, d))));
     document.getElementById("day-event-title").value = "";
+    document.getElementById("day-event-note").value = "";
     this.renderDayEventList();
     overlay.hidden = false;
     if (window.lucide) lucide.createIcons();
@@ -239,7 +240,10 @@ const Calendar = {
       .map(
         (ev) => `
         <li class="day-event-item" style="background:${ev.color || "#eee"}">
-          <span>${escapeHtml(ev.title)}${ev.note ? ` — ${escapeHtml(ev.note)}` : ""}</span>
+          <div class="day-event-text">
+            <span class="day-event-title">${escapeHtml(ev.title)}</span>
+            ${ev.note ? `<span class="day-event-note">${escapeHtml(ev.note)}</span>` : ""}
+          </div>
           <button type="button" class="day-event-delete" data-id="${ev.id}" aria-label="Remover evento"><i data-lucide="x"></i></button>
         </li>
       `
@@ -253,14 +257,17 @@ const Calendar = {
 
   async submitNewEvent() {
     const input = document.getElementById("day-event-title");
+    const noteInput = document.getElementById("day-event-note");
     const title = input.value.trim();
     if (!title || !this.selectedDate) return;
 
     const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-    const event = { id, date: this.selectedDate, title, color: this.selectedColor(), note: "" };
+    const note = noteInput ? noteInput.value.trim() : "";
+    const event = { id, date: this.selectedDate, title, color: this.selectedColor(), note };
 
     this.events.push(event);
     input.value = "";
+    if (noteInput) noteInput.value = "";
     this.renderDayEventList();
     this.renderMiniCalendar();
     this.renderFullCalendar();

@@ -895,12 +895,30 @@ a.btn:hover {
 .day-event-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   font-size: 14px;
   color: var(--ink);
+}
+
+.day-event-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.day-event-title {
+  font-weight: 600;
+}
+
+.day-event-note {
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .day-event-delete {
@@ -910,6 +928,7 @@ a.btn:hover {
   color: var(--ink-soft);
   display: flex;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .day-event-delete:hover {
@@ -927,12 +946,14 @@ a.btn:hover {
   gap: 12px;
 }
 
-.day-event-form input {
+.day-event-form input,
+.day-event-form textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   font-family: inherit;
   font-size: 14px;
+  resize: vertical;
 }
 
 .color-swatches {
