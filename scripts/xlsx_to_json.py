@@ -138,8 +138,8 @@ def parse_week(cells, start_row):
             status_cell = f"{status_col}{row_num}"
             subject = cells.get(subject_cell)
             status = cells.get(status_cell)
-            if subject is None and status is None:
-                continue
+            # Always include the slot, even when empty — the frontend needs a
+            # stable cell reference to let the user add a task into it.
             slots.append(
                 {
                     "row": row_num,

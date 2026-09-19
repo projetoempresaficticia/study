@@ -485,9 +485,58 @@ button, input, select {
   vertical-align: middle;
 }
 
-.slot-subject {
+.slot-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.slot-subject-btn {
+  border: none;
+  background: transparent;
+  padding: 2px 0;
   font-weight: 600;
   font-size: 13px;
+  font-family: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  border-radius: var(--radius-sm);
+}
+
+.slot-subject-btn:hover {
+  color: var(--accent);
+}
+
+.slot-subject-btn.empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  font-size: 12px;
+  border: 1px dashed var(--line);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.slot-subject-btn.empty i {
+  width: 12px;
+  height: 12px;
+}
+
+.slot-subject-btn.empty:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.slot-edit-input {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 13px;
+  width: 140px;
 }
 
 .slot-status {

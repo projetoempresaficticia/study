@@ -7,6 +7,11 @@ step — not a dependency for local/browser use). Two event types:
   toggle-slot   {"sheet": "AGOSTO", "statusCell": "B4", "status": "DONE"}
       Writes `status` into `statusCell` on `sheet`.
 
+  set-slot      {"sheet": "AGOSTO", "subjectCell": "A4", "statusCell": "B4",
+                  "subject": "FRANCÊS", "status": "NOT DONE"}
+      Writes both `subject` and `status` — used when the site adds a task to
+      an empty slot, or edits what's planned in an existing one.
+
   log-session   {"timestamp": "...", "minutes": 30, "subject": "...", "note": "..."}
       Appends a row to a "POMODORO LOG" sheet (created with a header row on
       first use).
@@ -39,6 +44,22 @@ def apply_toggle_slot(wb, payload):
     print(f"Set {sheet_name}!{cell} = {status}")
 
 
+def apply_set_slot(wb, payload):
+    sheet_name = payload["sheet"]
+    subject_cell = payload["subjectCell"]
+    status_cell = payload["statusCell"]
+    subject = payload["subject"]
+    status = payload["status"]
+    if status not in ("DONE", "NOT DONE"):
+        raise ValueError(f"Invalid status: {status!r}")
+    if sheet_name not in wb.sheetnames:
+        raise ValueError(f"Unknown sheet: {sheet_name!r}")
+    ws = wb[sheet_name]
+    ws[subject_cell] = subject
+    ws[status_cell] = status
+    print(f"Set {sheet_name}!{subject_cell} = {subject!r}, {sheet_name}!{status_cell} = {status!r}")
+
+
 def apply_log_session(wb, payload):
     if POMODORO_SHEET not in wb.sheetnames:
         ws = wb.create_sheet(POMODORO_SHEET)
@@ -58,6 +79,7 @@ def apply_log_session(wb, payload):
 
 HANDLERS = {
     "toggle-slot": apply_toggle_slot,
+    "set-slot": apply_set_slot,
     "log-session": apply_log_session,
 }
 

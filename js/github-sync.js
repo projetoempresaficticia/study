@@ -39,6 +39,10 @@ const GithubSync = {
     return this.dispatch("toggle-slot", { sheet, statusCell, status: nextStatus });
   },
 
+  setSlot({ sheet, subjectCell, statusCell, subject, status }) {
+    return this.dispatch("set-slot", { sheet, subjectCell, statusCell, subject, status });
+  },
+
   logPomodoroSession({ minutes, subject, note }) {
     return this.dispatch("log-session", {
       timestamp: new Date().toISOString(),
