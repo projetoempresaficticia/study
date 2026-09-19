@@ -79,25 +79,40 @@ const GithubSync = {
     }
 
     const path = `covers/book-${row}.jpg`;
+    const headers = {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+    };
+
+    // The Contents API needs the current file's sha to overwrite it — this
+    // is how "trocar capa" replaces an already-uploaded cover, not just a
+    // first-time add. No existing file just means a plain create (no sha).
+    let sha;
     try {
+      const existing = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { headers });
+      if (existing.ok) {
+        sha = (await existing.json()).sha;
+      }
+    } catch (err) {
+      // Couldn't check — fall through and attempt a create; a real conflict
+      // still surfaces as a clean error from the PUT below.
+    }
+
+    try {
+      const body = { message: `chore: ${sha ? "update" : "add"} cover for book row ${row}`, content: base64Content };
+      if (sha) body.sha = sha;
       const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
         method: "PUT",
-        headers: {
-          Accept: "application/vnd.github+json",
-          Authorization: `Bearer ${token}`,
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-        body: JSON.stringify({
-          message: `chore: add cover for book row ${row}`,
-          content: base64Content,
-        }),
+        headers,
+        body: JSON.stringify(body),
       });
       if (res.status === 201 || res.status === 200) {
         return { ok: true };
       }
-      const body = await res.text();
-      console.error("Cover upload failed:", res.status, body);
-      return { ok: false, reason: `http-${res.status}`, body };
+      const respBody = await res.text();
+      console.error("Cover upload failed:", res.status, respBody);
+      return { ok: false, reason: `http-${res.status}`, body: respBody };
     } catch (err) {
       console.error("Cover upload error:", err);
       return { ok: false, reason: "network" };

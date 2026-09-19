@@ -109,14 +109,15 @@ function imageExists(src) {
   });
 }
 
-function setCoverImage(el, src) {
-  const img = document.createElement("img");
-  img.src = src;
-  img.alt = "";
-  img.loading = "lazy";
-  img.className = "book-cover-img";
-  el.innerHTML = "";
-  el.appendChild(img);
+function setCoverImage(el, src, row) {
+  el.innerHTML = `
+    <img src="${src}" alt="" loading="lazy" class="book-cover-img" />
+    <label class="book-cover-change" title="Trocar capa (caso não seja o livro certo)">
+      <i data-lucide="pencil"></i>
+      <input type="file" accept="image/*" class="book-cover-upload-input" data-row="${row}" hidden />
+    </label>
+  `;
+  if (window.lucide) lucide.createIcons();
 }
 
 function showUploadButton(el, row, title) {
@@ -168,13 +169,13 @@ const CoverObserver = {
 
     const manualPath = manualCoverPath(row);
     if (await imageExists(manualPath)) {
-      setCoverImage(el, manualPath);
+      setCoverImage(el, manualPath, row);
       return;
     }
 
     const url = await resolveCoverUrl(title, author);
     if (url) {
-      setCoverImage(el, url);
+      setCoverImage(el, url, row);
       return;
     }
 
@@ -219,7 +220,7 @@ async function handleCoverUpload(input) {
   const wrap = input.closest(".book-cover");
 
   const dataUrl = await resizeImageToDataUrl(file, 640, 0.82);
-  if (wrap) setCoverImage(wrap, dataUrl);
+  if (wrap) setCoverImage(wrap, dataUrl, row);
 
   const base64 = dataUrl.split(",")[1];
   const result = await GithubSync.uploadCoverImage(row, base64);

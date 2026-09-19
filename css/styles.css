@@ -1148,6 +1148,49 @@ a.btn:hover {
   height: 12px;
 }
 
+/* Small "change cover" badge on covers that already resolved an image
+   (from an API match or a previous manual upload) — for when it's the
+   wrong book/edition. Always visible, not hover-only, so it works on
+   touch devices too. */
+
+.book-cover-change {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(43, 33, 25, 0.55);
+  color: white;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.book-cover-change:hover {
+  background: rgba(43, 33, 25, 0.8);
+  transform: scale(1.08);
+}
+
+.book-cover-change i {
+  width: 11px;
+  height: 11px;
+}
+
+.book-cover-sm .book-cover-change {
+  width: 15px;
+  height: 15px;
+  bottom: 1px;
+  right: 1px;
+}
+
+.book-cover-sm .book-cover-change i {
+  width: 8px;
+  height: 8px;
+}
+
 .book-cover-sm {
   width: 40px;
   height: 58px;
