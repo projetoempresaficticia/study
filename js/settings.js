@@ -6,6 +6,20 @@ const SETTINGS_KEYS = {
   token: "sp_github_token",
 };
 
+const DEFAULT_REPO = "projetoempresaficticia/study";
+
+function buildTokenCreationUrl(repo) {
+  const owner = (repo || DEFAULT_REPO).split("/")[0];
+  const params = new URLSearchParams({
+    name: "Study Planner Site",
+    description: "Permite o site gravar status e sessões de pomodoro em STUDY PLAN 2026.xlsx",
+    target_name: owner,
+    contents: "write",
+    expires_in: "366",
+  });
+  return `https://github.com/settings/personal-access-tokens/new?${params.toString()}`;
+}
+
 const Settings = {
   get() {
     return {
@@ -33,10 +47,17 @@ function initSettingsView() {
   const saveBtn = document.getElementById("settings-save");
   const clearBtn = document.getElementById("settings-clear");
   const status = document.getElementById("settings-status");
+  const tokenLink = document.getElementById("settings-token-link");
 
   const current = Settings.get();
-  repoInput.value = current.repo;
+  repoInput.value = current.repo || DEFAULT_REPO;
   tokenInput.value = current.token;
+
+  const refreshTokenLink = () => {
+    if (tokenLink) tokenLink.href = buildTokenCreationUrl(repoInput.value);
+  };
+  refreshTokenLink();
+  repoInput.addEventListener("input", refreshTokenLink);
 
   saveBtn.addEventListener("click", () => {
     if (!repoInput.value.includes("/")) {

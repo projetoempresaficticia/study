@@ -149,17 +149,21 @@
       </div>
       <div class="settings-panel">
         <p>
-          Para que o toggle de status e as sessões de pomodoro sejam gravados de volta
-          na planilha, este site precisa de um <strong>fine-grained personal access token</strong>
-          do GitHub com permissão <code>Contents: Read and write</code> apenas neste repositório.
+          Pra gravar o status e as sessões de pomodoro de volta na planilha, o site
+          precisa de uma autorização do GitHub, restrita só a este repositório.
+          O botão abaixo já abre a página de criação do token com tudo pré-preenchido —
+          só falta escolher o repositório na lista e clicar em "Generate token".
         </p>
         <p class="muted">O token fica salvo <strong>só no localStorage deste navegador</strong> — nunca é enviado a lugar nenhum além da API do GitHub, e nunca é commitado no repositório.</p>
         <label class="settings-field">
           Repositório (owner/repo)
           <input type="text" id="settings-repo" placeholder="ex: seu-usuario/study" />
         </label>
+        <a class="btn btn-primary btn-block" id="settings-token-link" target="_blank" rel="noopener">
+          <i data-lucide="external-link"></i> Criar token no GitHub (pré-preenchido)
+        </a>
         <label class="settings-field">
-          GitHub Personal Access Token
+          Cole o token gerado aqui
           <input type="password" id="settings-token" placeholder="github_pat_..." />
         </label>
         <div class="settings-actions">

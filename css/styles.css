@@ -354,12 +354,19 @@ button, input, select {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  text-decoration: none;
   transition: transform 0.1s ease, box-shadow 0.15s ease;
 }
 
 .btn i {
   width: 16px;
   height: 16px;
+}
+
+a.btn,
+a.btn:visited,
+a.btn:hover {
+  text-decoration: none;
 }
 
 .btn:hover:not(:disabled) {
