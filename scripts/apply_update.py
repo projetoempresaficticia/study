@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Apply a repository_dispatch payload to STUDY PLAN 2026.xlsx.
+"""Apply a repository_dispatch payload to the study or books spreadsheet.
 
 Run only inside the GitHub Action (needs `openpyxl`, installed as a workflow
-step — not a dependency for local/browser use). Two event types:
+step — not a dependency for local/browser use). Each event_type is routed to
+the .xlsx file it belongs to (see HANDLERS at the bottom).
+
+STUDY PLAN 2026.xlsx events:
 
   toggle-slot   {"sheet": "AGOSTO", "statusCell": "B4", "status": "DONE"}
       Writes `status` into `statusCell` on `sheet`.
@@ -24,21 +27,40 @@ step — not a dependency for local/browser use). Two event types:
   delete-event  {"id": "..."}
       Removes the row from "EVENTS" whose id matches.
 
-After writing, run scripts/xlsx_to_json.py separately to refresh the JSON
-snapshot the frontend reads — this script only touches the .xlsx.
+Books.xlsx events (only the "BOOKS" sheet is touched — see books_to_json.py
+for why the other sheets in that file are ignored):
+
+  add-book      {"row": 204, "title": "...", "author": "...", "genre": "...",
+                  "status": "Reading", "format": "Ebook", "rating": 4.5,
+                  "pages": 320, "dateFinished": "2026-09-20", "notes": "..."}
+      Writes a full new row. `row` comes from data/books.json's `nextRow` —
+      the frontend increments its own copy after each add in the same
+      session so two rapid adds don't target the same row (see js/books.js).
+
+  update-book   {"row": 12, "fields": {"status": "Finished", "rating": 4.5,
+                  "notes": "...", "dateFinished": "2026-09-20"}}
+      Only status/rating/notes/dateFinished are editable after a book is
+      added — title/author/genre/format/pages are set once at add time.
+
+After writing, run the matching *_to_json.py script separately to refresh
+the JSON snapshot the frontend reads — this script only touches the .xlsx.
 """
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from openpyxl import load_workbook
 
 ROOT = Path(__file__).resolve().parent.parent
-XLSX_PATH = ROOT / "STUDY PLAN 2026.xlsx"
+STUDY_XLSX_PATH = ROOT / "STUDY PLAN 2026.xlsx"
+BOOKS_XLSX_PATH = ROOT / "Books.xlsx"
+
 POMODORO_SHEET = "POMODORO LOG"
 POMODORO_HEADERS = ["timestamp", "minutes", "subject", "note"]
 EVENTS_SHEET = "EVENTS"
 EVENTS_HEADERS = ["id", "date", "title", "color", "note"]
+BOOKS_SHEET = "BOOKS"
 
 
 def apply_toggle_slot(wb, payload):
@@ -119,12 +141,68 @@ def apply_delete_event(wb, payload):
     print(f"Event {target_id!r} not found in '{EVENTS_SHEET}'")
 
 
+def iso_date_to_excel_serial(date_str):
+    if not date_str:
+        return None
+    try:
+        d = datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        return None
+    return (d - datetime(1899, 12, 30)).days
+
+
+def apply_add_book(wb, payload):
+    if BOOKS_SHEET not in wb.sheetnames:
+        raise ValueError(f"Sheet '{BOOKS_SHEET}' not found in {BOOKS_XLSX_PATH.name}")
+    ws = wb[BOOKS_SHEET]
+    row = payload["row"]
+    ws.cell(row=row, column=1, value=payload.get("title") or "")
+    ws.cell(row=row, column=2, value=payload.get("author") or None)
+    ws.cell(row=row, column=3, value=payload.get("genre") or None)
+    ws.cell(row=row, column=4, value=payload.get("status") or "Want to Read")
+    ws.cell(row=row, column=5, value=payload.get("format") or None)
+    if payload.get("rating") is not None:
+        ws.cell(row=row, column=6, value=payload["rating"])
+    if payload.get("pages") is not None:
+        ws.cell(row=row, column=7, value=payload["pages"])
+    serial = iso_date_to_excel_serial(payload.get("dateFinished"))
+    if serial is not None:
+        ws.cell(row=row, column=9, value=serial)
+    if payload.get("notes"):
+        ws.cell(row=row, column=10, value=payload["notes"])
+    print(f"Added book {payload.get('title')!r} at row {row}")
+
+
+BOOK_UPDATE_COLUMNS = {"status": 4, "rating": 6, "notes": 10}
+
+
+def apply_update_book(wb, payload):
+    if BOOKS_SHEET not in wb.sheetnames:
+        raise ValueError(f"Sheet '{BOOKS_SHEET}' not found in {BOOKS_XLSX_PATH.name}")
+    ws = wb[BOOKS_SHEET]
+    row = payload["row"]
+    fields = payload.get("fields", {})
+    for field, value in fields.items():
+        if field == "dateFinished":
+            serial = iso_date_to_excel_serial(value)
+            if serial is not None:
+                ws.cell(row=row, column=9, value=serial)
+            continue
+        col = BOOK_UPDATE_COLUMNS.get(field)
+        if col is None:
+            continue
+        ws.cell(row=row, column=col, value=value)
+    print(f"Updated book row {row}: {fields}")
+
+
 HANDLERS = {
-    "toggle-slot": apply_toggle_slot,
-    "set-slot": apply_set_slot,
-    "log-session": apply_log_session,
-    "add-event": apply_add_event,
-    "delete-event": apply_delete_event,
+    "toggle-slot": (STUDY_XLSX_PATH, apply_toggle_slot),
+    "set-slot": (STUDY_XLSX_PATH, apply_set_slot),
+    "log-session": (STUDY_XLSX_PATH, apply_log_session),
+    "add-event": (STUDY_XLSX_PATH, apply_add_event),
+    "delete-event": (STUDY_XLSX_PATH, apply_delete_event),
+    "add-book": (BOOKS_XLSX_PATH, apply_add_book),
+    "update-book": (BOOKS_XLSX_PATH, apply_update_book),
 }
 
 
@@ -134,21 +212,22 @@ def main():
         raise SystemExit(1)
 
     event_type, payload_raw = sys.argv[1], sys.argv[2]
-    handler = HANDLERS.get(event_type)
-    if handler is None:
+    routing = HANDLERS.get(event_type)
+    if routing is None:
         print(f"ERROR: unknown event_type {event_type!r}", file=sys.stderr)
         raise SystemExit(1)
+    xlsx_path, handler = routing
 
     payload = json.loads(payload_raw)
 
-    if not XLSX_PATH.exists():
-        print(f"ERROR: {XLSX_PATH} not found", file=sys.stderr)
+    if not xlsx_path.exists():
+        print(f"ERROR: {xlsx_path} not found", file=sys.stderr)
         raise SystemExit(1)
 
-    wb = load_workbook(XLSX_PATH)
+    wb = load_workbook(xlsx_path)
     handler(wb, payload)
-    wb.save(XLSX_PATH)
-    print(f"Saved {XLSX_PATH}")
+    wb.save(xlsx_path)
+    print(f"Saved {xlsx_path}")
 
 
 if __name__ == "__main__":

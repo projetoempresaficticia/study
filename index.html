@@ -30,6 +30,10 @@
       <i data-lucide="calendar"></i>
       <span>Calendário</span>
     </button>
+    <button class="nav-item" data-view="books" title="Livros">
+      <i data-lucide="book-open"></i>
+      <span>Livros</span>
+    </button>
     <button class="nav-item" data-view="settings" title="Configurações">
       <i data-lucide="settings"></i>
       <span>Ajustes</span>
@@ -110,6 +114,15 @@
         <button class="btn btn-ghost btn-block" id="mini-calendar-open">Ver calendário completo</button>
       </article>
 
+      <article class="card card-books">
+        <div class="card-head">
+          <span>Livros</span>
+          <i data-lucide="book-open"></i>
+        </div>
+        <div class="books-summary" id="books-summary"></div>
+        <button class="btn btn-ghost btn-block" id="books-open">Ver biblioteca completa</button>
+      </article>
+
     </section>
 
     <section class="view view-timetable" id="view-timetable" hidden>
@@ -171,6 +184,21 @@
       <div class="calendar-grid" id="calendar-grid"></div>
     </section>
 
+    <section class="view view-books" id="view-books" hidden>
+      <div class="view-header">
+        <div class="view-title">
+          <h2>Livros</h2>
+          <p class="muted" id="books-stats-line">—</p>
+        </div>
+        <button class="btn btn-primary" id="books-add-open"><i data-lucide="plus"></i> Adicionar livro</button>
+      </div>
+      <div class="books-toolbar">
+        <input type="text" id="books-search" placeholder="Buscar por título ou autor..." />
+        <div class="books-status-tabs" id="books-status-tabs"></div>
+      </div>
+      <div class="books-list" id="books-list"></div>
+    </section>
+
     <section class="view view-settings" id="view-settings" hidden>
       <div class="view-header">
         <div class="view-title">
@@ -226,11 +254,38 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="book-modal-overlay" hidden>
+  <div class="modal" id="book-modal" role="dialog" aria-modal="true" aria-labelledby="book-modal-title">
+    <div class="modal-header">
+      <h3 id="book-modal-title">Adicionar livro</h3>
+      <button class="modal-close" id="book-modal-close" aria-label="Fechar"><i data-lucide="x"></i></button>
+    </div>
+    <form class="book-form" id="book-form">
+      <input type="text" id="book-title" placeholder="Título" required maxlength="120" />
+      <input type="text" id="book-author" placeholder="Autor (opcional)" maxlength="80" />
+      <div class="book-form-row">
+        <input type="text" id="book-genre" list="book-genre-options" placeholder="Gênero (opcional)" maxlength="40" />
+        <datalist id="book-genre-options"></datalist>
+        <select id="book-format" aria-label="Formato"></select>
+      </div>
+      <div class="book-form-row">
+        <select id="book-status" aria-label="Status"></select>
+        <input type="number" id="book-pages" placeholder="Páginas" min="0" max="9999" />
+      </div>
+      <textarea id="book-notes" placeholder="Notas / resenha (opcional)" rows="2" maxlength="500"></textarea>
+      <button type="submit" class="btn btn-primary btn-block" id="book-form-submit">
+        <i data-lucide="plus"></i> Adicionar livro
+      </button>
+    </form>
+  </div>
+</div>
+
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="js/settings.js"></script>
 <script src="js/github-sync.js"></script>
 <script src="js/pomodoro.js"></script>
 <script src="js/calendar.js"></script>
+<script src="js/books.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -20,7 +20,7 @@ function showView(view) {
   document.querySelectorAll(".nav-item").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === view);
   });
-  ["home", "timetable", "pomodoro", "calendar", "settings"].forEach((v) => {
+  ["home", "timetable", "pomodoro", "calendar", "books", "settings"].forEach((v) => {
     const el = document.getElementById(`view-${v}`);
     if (el) el.hidden = v !== view;
   });
@@ -334,6 +334,12 @@ async function loadData() {
   return res.json();
 }
 
+async function loadBooksData() {
+  const res = await fetch("data/books.json", { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed to load books.json: ${res.status}`);
+  return res.json();
+}
+
 async function init() {
   if (window.lucide) lucide.createIcons();
   setTodayDate();
@@ -369,6 +375,17 @@ async function init() {
 
   if (window.Calendar) {
     Calendar.init(State.data.events || []);
+  }
+
+  if (window.Books) {
+    try {
+      const booksData = await loadBooksData();
+      Books.init(booksData);
+    } catch (err) {
+      console.error(err);
+      const el = document.getElementById("books-summary");
+      if (el) el.innerHTML = '<p class="muted">Não foi possível carregar data/books.json. Rode scripts/books_to_json.py.</p>';
+    }
   }
 
   if (window.lucide) lucide.createIcons();

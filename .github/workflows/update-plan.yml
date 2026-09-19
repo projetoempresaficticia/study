@@ -2,7 +2,7 @@ name: Update study plan
 
 on:
   repository_dispatch:
-    types: [toggle-slot, set-slot, log-session, add-event, delete-event]
+    types: [toggle-slot, set-slot, log-session, add-event, delete-event, add-book, update-book]
 
 permissions:
   contents: write
@@ -30,11 +30,14 @@ jobs:
       - name: Regenerate data/study-plan.json
         run: python scripts/xlsx_to_json.py
 
+      - name: Regenerate data/books.json
+        run: python scripts/books_to_json.py
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "STUDY PLAN 2026.xlsx" data/study-plan.json
+          git add "STUDY PLAN 2026.xlsx" data/study-plan.json "Books.xlsx" data/books.json
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

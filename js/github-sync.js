@@ -59,6 +59,14 @@ const GithubSync = {
   deleteEvent({ id }) {
     return this.dispatch("delete-event", { id });
   },
+
+  addBook(book) {
+    return this.dispatch("add-book", book);
+  },
+
+  updateBook({ row, fields }) {
+    return this.dispatch("update-book", { row, fields });
+  },
 };
 
 window.GithubSync = GithubSync;

@@ -974,6 +974,243 @@ a.btn:hover {
   border-color: var(--ink);
 }
 
+/* Books — home summary card */
+
+.books-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.books-stat-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.books-stat-row > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.books-stat-row strong {
+  font-size: 20px;
+}
+
+.books-stat-row span {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.books-reading-line {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+/* Books — full page */
+
+.books-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+#books-search {
+  flex: 1;
+  min-width: 200px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.books-status-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-tab {
+  border: 1px solid var(--line);
+  background: var(--cream);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.status-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.books-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.book-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.book-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.book-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 16px;
+}
+
+.book-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-transform: capitalize;
+}
+
+.book-notes-btn {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  padding: 2px 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+
+.book-notes-btn:hover {
+  color: var(--accent);
+}
+
+.book-notes-input {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  width: 100%;
+  max-width: 320px;
+  resize: vertical;
+}
+
+.book-status-select {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--cream);
+  flex-shrink: 0;
+}
+
+/* Star rating widget (0.5 increments) */
+
+.star-rating {
+  position: relative;
+  display: inline-block;
+  height: 18px;
+  width: 90px;
+  line-height: 1;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.star-rating-display {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.star-track,
+.star-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.star-track {
+  color: var(--accent-soft);
+}
+
+.star-fill {
+  color: var(--accent);
+}
+
+.star-rating-hit {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.star-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Book add form */
+
+.book-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.book-form input,
+.book-form select,
+.book-form textarea {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+}
+
+.book-form textarea {
+  resize: vertical;
+}
+
+.book-form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.book-form-row > * {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Responsive */
 
 @media (max-width: 960px) {
@@ -1019,5 +1256,11 @@ a.btn:hover {
   .event-pill,
   .event-more {
     font-size: 9px;
+  }
+  .book-item {
+    flex-direction: column;
+  }
+  .book-status-select {
+    align-self: flex-start;
   }
 }
