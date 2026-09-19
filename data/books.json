@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T17:29:35.099186+01:00",
+  "generatedAt": "2026-09-19T16:56:14.766665+00:00",
   "sourceFile": "Books.xlsx",
   "nextRow": 204,
   "genres": [
@@ -2338,7 +2338,7 @@
       "genre": null,
       "status": "Reading",
       "format": "Physical",
-      "rating": null,
+      "rating": 3.5,
       "pages": null,
       "dateFinished": null,
       "notes": null
