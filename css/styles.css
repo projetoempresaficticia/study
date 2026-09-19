@@ -332,6 +332,7 @@ button, input, select {
 }
 
 .language-list .lang-bar-fill {
+  display: block;
   height: 100%;
   background: var(--accent);
 }
