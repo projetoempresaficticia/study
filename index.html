@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Study Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div class="app">
+
+  <nav class="sidebar" aria-label="Navegação principal">
+    <div class="sidebar-mark">SP</div>
+    <button class="nav-item active" data-view="home" title="Início">
+      <i data-lucide="home"></i>
+      <span>Início</span>
+    </button>
+    <button class="nav-item" data-view="timetable" title="Plano semanal">
+      <i data-lucide="calendar-days"></i>
+      <span>Plano</span>
+    </button>
+    <button class="nav-item" data-view="pomodoro" title="Pomodoro">
+      <i data-lucide="timer"></i>
+      <span>Foco</span>
+    </button>
+    <button class="nav-item" data-view="settings" title="Configurações">
+      <i data-lucide="settings"></i>
+      <span>Ajustes</span>
+    </button>
+  </nav>
+
+  <main class="content">
+
+    <header class="topbar">
+      <div class="greeting">
+        <p class="date" id="today-date"></p>
+        <h1>Good morning.</h1>
+        <p class="subtitle">Sua semana de estudos, de um jeito visível.</p>
+      </div>
+      <div class="topbar-actions">
+        <span class="sync-indicator" id="sync-indicator" title="Estado da sincronização com o GitHub">
+          <i data-lucide="cloud"></i>
+          <span id="sync-indicator-text">local</span>
+        </span>
+      </div>
+    </header>
+
+    <section class="cards-grid" id="view-home">
+
+      <article class="card card-quote">
+        <i data-lucide="quote" class="card-icon"></i>
+        <p class="quote-text" id="quote-text">Um passo de cada vez também é progresso.</p>
+      </article>
+
+      <article class="card card-progress">
+        <div class="card-head">
+          <span>Progresso da semana</span>
+          <i data-lucide="target"></i>
+        </div>
+        <div class="progress-ring-wrap">
+          <svg class="progress-ring" width="120" height="120" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52" />
+            <circle class="ring-fg" id="progress-ring-fg" cx="60" cy="60" r="52" />
+          </svg>
+          <div class="progress-ring-label">
+            <strong id="progress-ring-pct">0%</strong>
+            <span id="progress-ring-count">0/0</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card-pomodoro">
+        <div class="card-head">
+          <span>Foco de hoje</span>
+          <i data-lucide="timer"></i>
+        </div>
+        <div class="pomodoro-mini">
+          <strong id="pomodoro-mini-time">30:00</strong>
+          <span id="pomodoro-mini-phase">pronto pra focar</span>
+        </div>
+        <div class="pomodoro-mini-stats">
+          <span><i data-lucide="check-circle-2"></i> <span id="pomodoro-cycles-today">0</span> ciclos hoje</span>
+        </div>
+        <button class="btn btn-primary btn-block" id="pomodoro-mini-start">Ir para o timer</button>
+      </article>
+
+      <article class="card card-languages">
+        <div class="card-head">
+          <span>Idiomas na semana</span>
+          <i data-lucide="languages"></i>
+        </div>
+        <ul class="language-list" id="language-list"></ul>
+      </article>
+
+    </section>
+
+    <section class="view view-timetable" id="view-timetable" hidden>
+      <div class="view-header">
+        <div class="view-title">
+          <h2>Plano semanal</h2>
+        </div>
+        <div class="week-nav">
+          <select id="month-select" aria-label="Mês"></select>
+          <div class="week-buttons" id="week-buttons"></div>
+        </div>
+      </div>
+      <div class="timetable-wrap">
+        <table class="timetable" id="timetable">
+          <thead>
+            <tr id="timetable-head"></tr>
+          </thead>
+          <tbody id="timetable-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view view-pomodoro" id="view-pomodoro" hidden>
+      <div class="view-header">
+        <div class="view-title">
+          <h2>Sessão de foco</h2>
+          <p class="muted">30 minutos de foco, 5 minutos de descanso.</p>
+        </div>
+      </div>
+      <div class="pomodoro-panel">
+        <div class="pomodoro-phase-badge" id="pomodoro-phase-badge">Foco</div>
+        <div class="pomodoro-time" id="pomodoro-time">30:00</div>
+        <label class="pomodoro-subject">
+          Matéria (opcional)
+          <select id="pomodoro-subject"></select>
+        </label>
+        <div class="pomodoro-controls">
+          <button class="btn btn-primary" id="pomodoro-start"><i data-lucide="play"></i> Começar</button>
+          <button class="btn" id="pomodoro-pause" disabled><i data-lucide="pause"></i> Pausar</button>
+          <button class="btn btn-ghost" id="pomodoro-reset"><i data-lucide="rotate-ccw"></i> Reiniciar</button>
+        </div>
+        <p class="pomodoro-cycles">Ciclos completos hoje: <strong id="pomodoro-cycles-today-2">0</strong></p>
+      </div>
+    </section>
+
+    <section class="view view-settings" id="view-settings" hidden>
+      <div class="view-header">
+        <div class="view-title">
+          <h2>Ajustes</h2>
+          <p class="muted">Configure a sincronização com o GitHub para salvar seu progresso.</p>
+        </div>
+      </div>
+      <div class="settings-panel">
+        <p>
+          Para que o toggle de status e as sessões de pomodoro sejam gravados de volta
+          na planilha, este site precisa de um <strong>fine-grained personal access token</strong>
+          do GitHub com permissão <code>Contents: Read and write</code> apenas neste repositório.
+        </p>
+        <p class="muted">O token fica salvo <strong>só no localStorage deste navegador</strong> — nunca é enviado a lugar nenhum além da API do GitHub, e nunca é commitado no repositório.</p>
+        <label class="settings-field">
+          Repositório (owner/repo)
+          <input type="text" id="settings-repo" placeholder="ex: seu-usuario/study" />
+        </label>
+        <label class="settings-field">
+          GitHub Personal Access Token
+          <input type="password" id="settings-token" placeholder="github_pat_..." />
+        </label>
+        <div class="settings-actions">
+          <button class="btn btn-primary" id="settings-save">Salvar</button>
+          <button class="btn btn-ghost" id="settings-clear">Limpar</button>
+        </div>
+        <p class="settings-status" id="settings-status"></p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/settings.js"></script>
+<script src="js/github-sync.js"></script>
+<script src="js/pomodoro.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
