@@ -611,11 +611,15 @@ a.btn:hover {
   color: var(--ink-soft);
 }
 
-.pomodoro-subject select {
+.pomodoro-subject select,
+.pomodoro-subject input {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   min-width: 220px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
 }
 
 .pomodoro-controls {

@@ -58,6 +58,8 @@ const Pomodoro = {
 
   init() {
     this.subjectSelect = document.getElementById("pomodoro-subject");
+    this.customWrap = document.getElementById("pomodoro-custom-wrap");
+    this.customInput = document.getElementById("pomodoro-custom-subject");
     this.render();
     document.getElementById("pomodoro-start").addEventListener("click", () => this.start());
     document.getElementById("pomodoro-pause").addEventListener("click", () => this.pause());
@@ -65,10 +67,16 @@ const Pomodoro = {
     document.getElementById("pomodoro-mini-start").addEventListener("click", () => {
       window.SPApp && window.SPApp.showView("pomodoro");
     });
+    this.subjectSelect.addEventListener("change", () => {
+      const isCustom = this.subjectSelect.value === "__custom__";
+      this.customWrap.hidden = !isCustom;
+      if (isCustom) this.customInput.focus();
+    });
   },
 
   populateSubjects(languages) {
     if (!this.subjectSelect) return;
+    const previous = this.subjectSelect.value;
     this.subjectSelect.innerHTML = '<option value="">(nenhuma)</option>';
     languages.forEach((lang) => {
       const opt = document.createElement("option");
@@ -76,6 +84,21 @@ const Pomodoro = {
       opt.textContent = lang;
       this.subjectSelect.appendChild(opt);
     });
+    const customOpt = document.createElement("option");
+    customOpt.value = "__custom__";
+    customOpt.textContent = "Personalizado…";
+    this.subjectSelect.appendChild(customOpt);
+    if ([...this.subjectSelect.options].some((o) => o.value === previous)) {
+      this.subjectSelect.value = previous;
+    }
+  },
+
+  currentSubject() {
+    if (!this.subjectSelect) return "";
+    if (this.subjectSelect.value === "__custom__") {
+      return (this.customInput && this.customInput.value.trim()) || "";
+    }
+    return this.subjectSelect.value;
   },
 
   start() {
@@ -113,7 +136,7 @@ const Pomodoro = {
     if (this.phase === "focus") {
       const cycles = incrementCyclesToday();
       this.updateCycleCounters(cycles);
-      const subject = this.subjectSelect ? this.subjectSelect.value : "";
+      const subject = this.currentSubject();
       if (window.GithubSync) {
         GithubSync.logPomodoroSession({ minutes: 30, subject, note: "ciclo de foco concluído" });
       }
