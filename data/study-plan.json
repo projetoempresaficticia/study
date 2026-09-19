@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T18:02:06.401353+00:00",
+  "generatedAt": "2026-09-19T18:02:17.089712+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -9475,16 +9475,5 @@
     }
   ],
   "pomodoroLog": [],
-  "events": [
-    {
-      "id": "mu8p2ixmckpb",
-      "date": "2026-09-19",
-      "title": "k",
-      "color": "#C7F2D5",
-      "note": null,
-      "type": "task",
-      "done": false,
-      "subtasks": []
-    }
-  ]
+  "events": []
 }
