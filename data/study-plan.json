@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T23:34:48.324152+00:00",
+  "generatedAt": "2026-09-21T23:35:13.816810+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -2200,8 +2200,8 @@
                 },
                 {
                   "row": 13,
-                  "subject": null,
-                  "status": null,
+                  "subject": "INDONESIAN",
+                  "status": "NOT DONE",
                   "subjectCell": "C13",
                   "statusCell": "D13"
                 },
@@ -2494,7 +2494,7 @@
           ],
           "stats": {
             "done": 0,
-            "notDone": 6,
+            "notDone": 7,
             "ratio": 0.0,
             "byLanguage": {
               "EMOCIONAL": {
@@ -2524,6 +2524,10 @@
               "JAPONES": {
                 "done": 0,
                 "notDone": 3
+              },
+              "INDONESIAN": {
+                "done": 0,
+                "notDone": 1
               },
               "LIBRAS": {
                 "done": 0,
