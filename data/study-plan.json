@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T23:38:23.630858+00:00",
+  "generatedAt": "2026-09-21T23:38:33.288210+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -2118,7 +2118,7 @@
                 {
                   "row": 14,
                   "subject": "IDIOMAS",
-                  "status": null,
+                  "status": "DONE",
                   "subjectCell": "A14",
                   "statusCell": "B14"
                 },
@@ -2493,9 +2493,9 @@
             }
           ],
           "stats": {
-            "done": 1,
+            "done": 2,
             "notDone": 9,
-            "ratio": 0.1,
+            "ratio": 0.1818,
             "byLanguage": {
               "EMOCIONAL": {
                 "done": 1,
@@ -2510,7 +2510,7 @@
                 "notDone": 0
               },
               "IDIOMAS": {
-                "done": 0,
+                "done": 1,
                 "notDone": 0
               },
               "ALEMÃO": {
