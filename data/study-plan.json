@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T23:35:13.816810+00:00",
+  "generatedAt": "2026-09-21T23:35:32.881842+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -2214,8 +2214,8 @@
                 },
                 {
                   "row": 15,
-                  "subject": null,
-                  "status": null,
+                  "subject": "INDONESIAN",
+                  "status": "NOT DONE",
                   "subjectCell": "C15",
                   "statusCell": "D15"
                 }
@@ -2494,7 +2494,7 @@
           ],
           "stats": {
             "done": 0,
-            "notDone": 7,
+            "notDone": 8,
             "ratio": 0.0,
             "byLanguage": {
               "EMOCIONAL": {
@@ -2527,7 +2527,7 @@
               },
               "INDONESIAN": {
                 "done": 0,
-                "notDone": 1
+                "notDone": 2
               },
               "LIBRAS": {
                 "done": 0,
