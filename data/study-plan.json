@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T23:28:03.907140+00:00",
+  "generatedAt": "2026-09-21T23:32:53.143095+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -1566,7 +1566,7 @@
                 {
                   "row": 65,
                   "subject": "INDONESIAN",
-                  "status": "NOT DONE",
+                  "status": "DONE",
                   "subjectCell": "A65",
                   "statusCell": "B65"
                 },
@@ -1983,17 +1983,17 @@
             }
           ],
           "stats": {
-            "done": 1,
-            "notDone": 59,
-            "ratio": 0.0167,
+            "done": 2,
+            "notDone": 58,
+            "ratio": 0.0333,
             "byLanguage": {
               "JAPONÊS": {
                 "done": 1,
                 "notDone": 5
               },
               "INDONESIAN": {
-                "done": 0,
-                "notDone": 9
+                "done": 1,
+                "notDone": 8
               },
               "LIBRAS": {
                 "done": 0,
