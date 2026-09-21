@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T22:56:21.919844+00:00",
+  "generatedAt": "2026-09-21T23:28:03.907140+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -9483,6 +9483,12 @@
       "timestamp": "2026-09-21T22:50:34.570Z",
       "minutes": 30,
       "subject": "JAPONÊS",
+      "note": "ciclo de foco concluído"
+    },
+    {
+      "timestamp": "2026-09-21T23:27:54.460Z",
+      "minutes": 30,
+      "subject": "INDONESIAN",
       "note": "ciclo de foco concluído"
     }
   ],
