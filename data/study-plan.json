@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T18:17:28.499535+00:00",
+  "generatedAt": "2026-09-21T22:50:48.816369+00:00",
   "sourceFile": "STUDY PLAN 2026.xlsx",
   "languages": [
     "ALEMÃO",
@@ -9478,6 +9478,13 @@
       ]
     }
   ],
-  "pomodoroLog": [],
+  "pomodoroLog": [
+    {
+      "timestamp": "2026-09-21T22:50:34.570Z",
+      "minutes": 30,
+      "subject": "JAPONÊS",
+      "note": "ciclo de foco concluído"
+    }
+  ],
   "events": []
 }
